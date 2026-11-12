@@ -1,0 +1,729 @@
+/* Paleta de Plaza U: todo el sitio usa estas variables, así cambiar un color es tocar una línea */
+:root {
+  --lino: #f7f4ee; /* fondo */
+  --superficie: #fffdf9; /* tarjetas */
+  --oliva: #2b3a33; /* textos */
+  --texto2: #4a5a51;
+  --linea: #e6e1d4;
+  --salvia: #4f7a64; /* color principal */
+  --salvia-claro: #7fa891;
+  --barro: #b85c3a; /* botones de acción */
+  --barro-oscuro: #a24e30;
+  --arena: #ebd6a6; /* acentos */
+  --verde-claro: #dce8d8;
+  --ok: #2a6847;
+  --error: #b3402a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  margin: 0;
+  font-family: 'Figtree', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--oliva);
+  background: var(--lino);
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Bricolage Grotesque', 'Figtree', sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(2.1rem, 5.4vw, 3.6rem);
+  font-weight: 800;
+}
+
+h2 {
+  font-size: clamp(1.55rem, 3.4vw, 2.2rem);
+  font-weight: 800;
+}
+
+h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+p {
+  margin: 0;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid var(--salvia);
+  outline-offset: 2px;
+}
+
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.contenedor {
+  width: min(1160px, 100% - 40px);
+  margin-inline: auto;
+}
+
+/* ---------- Encabezado ---------- */
+.encabezado {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--lino);
+  border-bottom: 1px solid var(--linea);
+}
+
+/* El toldo de la plaza de mercado: rayas con semicírculos abajo */
+.toldo {
+  height: 22px;
+  background: repeating-linear-gradient(90deg, var(--salvia-claro) 0 24px, var(--arena) 24px 48px);
+  -webkit-mask:
+    linear-gradient(#000, #000) 0 0 / 100% 10px no-repeat,
+    radial-gradient(circle at 12px 0, #000 11.5px, #0000 12.5px) 0 9px / 24px 13px repeat-x;
+  mask:
+    linear-gradient(#000, #000) 0 0 / 100% 10px no-repeat,
+    radial-gradient(circle at 12px 0, #000 11.5px, #0000 12.5px) 0 9px / 24px 13px repeat-x;
+}
+
+.encabezado-fila {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: 0;
+  padding: 0;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: 1.45rem;
+  letter-spacing: -0.03em;
+}
+
+.menu {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.menu button {
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 16px;
+  font-weight: 600;
+  color: var(--texto2);
+}
+
+.menu button:hover {
+  background: var(--linea);
+}
+
+.menu button.activo {
+  background: var(--salvia);
+  color: #fff;
+}
+
+.boton-carrito {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--superficie);
+  border: 1.5px solid var(--linea);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-weight: 700;
+}
+
+.contador {
+  background: var(--barro);
+  color: #fff;
+  border-radius: 999px;
+  min-width: 24px;
+  padding: 0 7px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* ---------- Botones ---------- */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  padding: 11px 22px;
+  font-weight: 700;
+  line-height: 1.1;
+  transition:
+    transform 0.12s,
+    background 0.12s;
+}
+
+.boton:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.boton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.boton-barro {
+  background: var(--barro);
+  color: #fff;
+}
+
+.boton-barro:hover:not(:disabled) {
+  background: var(--barro-oscuro);
+}
+
+.boton-verde {
+  background: var(--salvia);
+  color: #fff;
+  padding: 8px 16px;
+}
+
+.boton-verde:hover:not(:disabled) {
+  background: var(--ok);
+}
+
+.boton-borde {
+  background: transparent;
+  border-color: var(--oliva);
+}
+
+.boton-borde:hover {
+  background: var(--linea);
+}
+
+.boton-ancho {
+  width: 100%;
+}
+
+.enlace {
+  background: none;
+  border: 0;
+  color: var(--ok);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+/* ---------- Portada ---------- */
+.portada {
+  background: var(--verde-claro);
+  margin-block: 22px;
+  padding: 44px 0;
+}
+
+.portada-fila {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 36px;
+  align-items: center;
+}
+
+.portada p {
+  font-size: 1.1rem;
+  max-width: 50ch;
+  margin: 16px 0 22px;
+  color: var(--texto2);
+}
+
+.portada-imagen {
+  width: 100%;
+  height: 340px;
+  object-fit: cover;
+  border-radius: 28px;
+  border: 8px solid #fff;
+  transform: rotate(2deg);
+}
+
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ---------- Secciones y tarjetas ---------- */
+.seccion {
+  padding-block: 30px;
+}
+
+.seccion-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.titulo-pagina {
+  font-size: clamp(2rem, 4.5vw, 3rem);
+}
+
+.subtitulo {
+  color: var(--texto2);
+  margin: 8px 0 18px;
+}
+
+/* La cuadrícula mete tantas columnas como quepan, de mínimo 235 px */
+.cuadricula {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+  gap: 18px;
+}
+
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tarjeta img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+}
+
+.tarjeta-cuerpo {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.etiqueta {
+  align-self: flex-start;
+  background: var(--arena);
+  border-radius: 999px;
+  padding: 2px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.vendedor {
+  color: var(--texto2);
+  font-size: 0.92rem;
+}
+
+.detalle {
+  color: var(--texto2);
+  font-size: 0.85rem;
+}
+
+.tarjeta-pie {
+  margin-top: auto;
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.precio {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.15rem;
+}
+
+/* ---------- Filtros ---------- */
+.barra-filtros {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.buscador {
+  flex: 1;
+  min-width: 220px;
+  margin-bottom: 12px;
+}
+
+.barra-filtros .buscador {
+  margin-bottom: 0;
+}
+
+input[type='search'],
+.formulario input,
+.formulario select,
+.formulario textarea,
+.orden select {
+  width: 100%;
+  background: var(--superficie);
+  border: 1.5px solid var(--linea);
+  border-radius: 14px;
+  padding: 11px 14px;
+}
+
+.orden {
+  min-width: 210px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  background: var(--superficie);
+  border: 1.5px solid var(--linea);
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.chip.activo {
+  background: var(--salvia);
+  border-color: var(--salvia);
+  color: #fff;
+}
+
+.contador-resultados {
+  margin: 16px 0 12px;
+  color: var(--texto2);
+  font-weight: 600;
+}
+
+.vacio {
+  background: var(--superficie);
+  border: 2px dashed var(--linea);
+  border-radius: 20px;
+  padding: 36px;
+  text-align: center;
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+}
+
+/* ---------- Así funciona ---------- */
+.pasos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.paso {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 20px;
+  padding: 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.paso-numero {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--barro);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+}
+
+.paso p {
+  color: var(--texto2);
+}
+
+/* ---------- Cursos: mis inscripciones ---------- */
+.mis-cursos {
+  margin-top: 36px;
+}
+
+.mis-cursos ul,
+.mis-productos ul {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+  display: grid;
+  gap: 10px;
+}
+
+.mis-cursos li {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-left: 6px solid var(--salvia);
+  border-radius: 14px;
+  padding: 12px 16px;
+}
+
+/* ---------- Vender ---------- */
+.vender-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.formulario {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 24px;
+  padding: 24px;
+  display: grid;
+  gap: 14px;
+}
+
+.campo {
+  display: grid;
+  gap: 6px;
+}
+
+.campo label {
+  font-weight: 700;
+}
+
+.fila-doble {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.error {
+  color: var(--error);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.mis-productos li {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 14px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.mis-productos li div {
+  display: grid;
+}
+
+.mis-productos li span {
+  color: var(--texto2);
+  font-size: 0.9rem;
+}
+
+.quitar {
+  background: none;
+  border: 0;
+  color: var(--error);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+/* ---------- Carrito ---------- */
+.velo {
+  position: fixed;
+  inset: 0;
+  background: rgba(43, 58, 51, 0.5);
+  z-index: 40;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.carrito {
+  width: min(430px, 100%);
+  height: 100%;
+  background: var(--lino);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+
+.carrito-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.boton-cerrar {
+  background: none;
+  border: 0;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.carrito-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.carrito-item {
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  gap: 12px;
+  align-items: start;
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 16px;
+  padding: 10px;
+}
+
+.carrito-item img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.carrito-datos {
+  display: grid;
+  gap: 2px;
+  font-size: 0.92rem;
+}
+
+.carrito-datos span {
+  color: var(--texto2);
+}
+
+.cantidad {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.cantidad button:not(.quitar) {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--oliva);
+  background: none;
+  font-weight: 700;
+}
+
+.carrito-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  border-top: 1px solid var(--linea);
+  padding-top: 12px;
+  margin-top: auto;
+}
+
+.carrito-nota,
+.carrito-vacio {
+  color: var(--texto2);
+  font-size: 0.9rem;
+}
+
+/* ---------- Aviso y pie ---------- */
+.aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  background: var(--oliva);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-weight: 600;
+  z-index: 60;
+  max-width: calc(100% - 32px);
+}
+
+.pie {
+  background: #ece7da;
+  margin-top: 40px;
+  padding: 28px 0;
+}
+
+.pie-fila {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.pie-marca {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.3rem;
+}
+
+.pie-nota {
+  color: var(--texto2);
+  font-size: 0.9rem;
+}
+
+/* ---------- Celular y tablet ---------- */
+@media (max-width: 860px) {
+  .portada-fila,
+  .vender-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .portada-imagen {
+    height: 240px;
+  }
+
+  .pasos {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .encabezado-fila {
+    flex-wrap: wrap;
+  }
+
+  .menu {
+    order: 3;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+  }
+
+  .boton-carrito {
+    margin-left: auto;
+  }
+}

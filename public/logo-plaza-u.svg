@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Plaza U">
+  <title>Plaza U</title>
+  <g id="Toldo">
+    <path id="Toldo_techo" d="M14 48h92l-9-30H23z" fill="#B85C3A"/>
+    <path id="Toldo_festones" d="M14 48h92a12 12 0 0 1-23 0 12 12 0 0 1-23 0 12 12 0 0 1-23 0 12 12 0 0 1-23 0z" fill="#EBD6A6"/>
+  </g>
+  <g id="Puesto">
+    <rect id="Fachada" x="22" y="62" width="76" height="44" rx="5" fill="#7FA891"/>
+    <rect id="Puerta" x="48" y="76" width="24" height="30" rx="2" fill="#2F4A3E"/>
+    <rect id="Ventana_izquierda" x="28" y="70" width="14" height="14" rx="2" fill="#F7F4EE"/>
+    <rect id="Ventana_derecha" x="78" y="70" width="14" height="14" rx="2" fill="#F7F4EE"/>
+  </g>
+</svg>

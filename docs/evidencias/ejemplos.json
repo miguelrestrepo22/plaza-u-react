@@ -1,0 +1,203 @@
+[
+  {
+    "titulo": "Iniciar sesión",
+    "peticion": "POST /api/auth/login",
+    "cuerpo": {
+      "email": "camila@plazau.co",
+      "password": "demo1234"
+    },
+    "autenticada": false,
+    "estado": 200,
+    "respuesta": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6…",
+      "usuario": {
+        "id": "u_camila",
+        "nombre": "Camila Restrepo",
+        "email": "camila@plazau.co",
+        "rol": "estudiante",
+        "carrera": "Diseño industrial",
+        "whatsapp": "3015550102",
+        "negocio": "Luz de Camila",
+        "creado": "2026-11-12T00:26:16.746Z"
+      }
+    }
+  },
+  {
+    "titulo": "Listar productos de una categoría",
+    "peticion": "GET /api/productos?categoria=Comida&limite=2",
+    "cuerpo": null,
+    "autenticada": false,
+    "estado": 200,
+    "respuesta": [
+      {
+        "id": "p3",
+        "nombre": "Caja de 6 brownies de chocolate",
+        "categoria": "Comida",
+        "precio": 28000,
+        "stock": 20,
+        "descripcion": "Brownies húmedos con nueces y cobertura de chocolate semiamargo. Se hornean el mismo día del despacho.",
+        "foto": "/fotos/brownies.jpg",
+        "vendedorId": "u_valentina",
+        "creado": "2026-11-11T22:26:17.220Z"
+      },
+      {
+        "id": "p4",
+        "nombre": "Café de origen Antioquia, 250 g",
+        "categoria": "Comida",
+        "precio": 22000,
+        "stock": 37,
+        "descripcion": "Café de finca en grano o molido. Tueste medio, notas a panela y cacao. Indica en las notas si lo quieres molido para filtro o prensa.",
+        "foto": "/fotos/cafe.jpg",
+        "vendedorId": "u_sebastian",
+        "creado": "2026-11-11T21:26:17.221Z"
+      }
+    ]
+  },
+  {
+    "titulo": "Crear un producto",
+    "peticion": "POST /api/productos",
+    "cuerpo": {
+      "nombre": "Galletas de avena y miel",
+      "categoria": "Comida",
+      "precio": 12000,
+      "stock": 25,
+      "descripcion": "Galletas caseras de avena con miel, bolsa de 8 unidades."
+    },
+    "autenticada": true,
+    "estado": 201,
+    "respuesta": {
+      "id": "p_16805eeb",
+      "nombre": "Galletas de avena y miel",
+      "categoria": "Comida",
+      "precio": 12000,
+      "stock": 25,
+      "descripcion": "Galletas caseras de avena con miel, bolsa de 8 unidades.",
+      "foto": "/fotos/suculentas.jpg",
+      "vendedorId": "u_camila",
+      "creado": "2026-11-12T00:27:05.589Z"
+    }
+  },
+  {
+    "titulo": "Error de validación",
+    "peticion": "POST /api/productos",
+    "cuerpo": {
+      "nombre": "A",
+      "categoria": "Autos",
+      "precio": 100,
+      "stock": 5,
+      "descripcion": "corta"
+    },
+    "autenticada": true,
+    "estado": 400,
+    "respuesta": {
+      "error": {
+        "estado": 400,
+        "mensaje": "Hay datos inválidos en la petición",
+        "detalles": [
+          {
+            "campo": "nombre",
+            "mensaje": "El nombre debe tener entre 3 y 120 caracteres"
+          },
+          {
+            "campo": "categoria",
+            "mensaje": "La categoría debe ser una de: Comida, Artesanías, Velas y hogar, Moda, Accesorios, Papelería, Plantas, Cuidado personal, Tecnología"
+          },
+          {
+            "campo": "precio",
+            "mensaje": "El precio debe ser un entero entre 500 y 10.000.000"
+          },
+          {
+            "campo": "descripcion",
+            "mensaje": "La descripción debe tener entre 10 y 1000 caracteres"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "titulo": "Crear un pedido",
+    "peticion": "POST /api/pedidos",
+    "cuerpo": {
+      "items": [
+        {
+          "productoId": "p2",
+          "cantidad": 1
+        }
+      ],
+      "cliente": {
+        "nombre": "Ana Torres",
+        "celular": "3001234567",
+        "direccion": "Bloque 5, salón 302"
+      },
+      "pago": "Nequi"
+    },
+    "autenticada": true,
+    "estado": 201,
+    "respuesta": [
+      {
+        "id": "PU-1003",
+        "compradorId": "u_camila",
+        "vendedorId": "u_andres",
+        "items": [
+          {
+            "foto": "/fotos/amigurumi.jpg",
+            "nombre": "Oso Teo tejido a mano (crochet)",
+            "precio": 48000,
+            "cantidad": 1,
+            "productoId": "p2"
+          }
+        ],
+        "total": 48000,
+        "comision": 4800,
+        "pago": "Nequi",
+        "estado": "Nuevo",
+        "cliente": {
+          "nombre": "Ana Torres",
+          "celular": "3001234567",
+          "direccion": "Bloque 5, salón 302"
+        },
+        "creado": "2026-11-12T00:27:05.608Z",
+        "actualizado": "2026-11-12T00:27:05.608Z"
+      }
+    ]
+  },
+  {
+    "titulo": "Pedir más de lo que hay",
+    "peticion": "POST /api/pedidos",
+    "cuerpo": {
+      "items": [
+        {
+          "productoId": "p2",
+          "cantidad": 99
+        }
+      ],
+      "cliente": {
+        "nombre": "Ana Torres",
+        "celular": "3001234567",
+        "direccion": "Bloque 5, salón 302"
+      },
+      "pago": "Nequi"
+    },
+    "autenticada": true,
+    "estado": 409,
+    "respuesta": {
+      "error": {
+        "estado": 409,
+        "mensaje": "Solo quedan 5 unidades de «Oso Teo tejido a mano (crochet)»"
+      }
+    }
+  },
+  {
+    "titulo": "Sin sesión",
+    "peticion": "GET /api/pedidos",
+    "cuerpo": null,
+    "autenticada": false,
+    "estado": 401,
+    "respuesta": {
+      "error": {
+        "estado": 401,
+        "mensaje": "Debes iniciar sesión: falta el token en el encabezado Authorization"
+      }
+    }
+  }
+]

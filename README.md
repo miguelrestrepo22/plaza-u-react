@@ -1,82 +1,79 @@
-# Plaza U · Primer entregable (React)
+# Plaza U
 
-Plaza U es el mercadito y la escuela de los estudiantes: un sitio donde se **comercializan productos hechos por estudiantes** y se **ofrecen cursos presenciales** dentro de la universidad.
+Plaza U es el mercadito y la escuela de los estudiantes: un sitio donde se **comercializan productos hechos por estudiantes** y se **ofrecen cursos presenciales** dentro de la universidad. Las entregas y las clases son solo dentro del campus.
 
-Este repositorio es el **primer entregable** de Construcción de Software III: la implementación inicial del frontend con JavaScript y React. Los datos son de ejemplo (arreglos en `src/data`), no hay base de datos ni servidor.
+**Integrantes:** Miguel Angel Restrepo Pineda y Lucas Lobo Lopez · Tecnológico de Antioquia · Construcción de Software III
 
-**Integrantes:** Miguel Angel Restrepo Pineda y Lucas Lobo Lopez · Tecnológico de Antioquia · 2026
+Este repositorio reúne el **frontend** (React) y el **backend** (API REST con Node.js y Express):
 
-## Qué se puede hacer
-
-- **Inicio:** portada, los productos más nuevos, cursos destacados y cómo funciona.
-- **Mercadito:** buscar (sin importar tildes ni mayúsculas), filtrar por categoría y ordenar por precio.
-- **Carrito:** agregar, subir o bajar la cantidad, quitar, ver el total y finalizar el pedido (simulado, descuenta el stock).
-- **Cursos:** buscar, filtrar por nivel e inscribirse (baja el cupo y se ve en «Mis inscripciones»).
-- **Vender:** formulario con validación para publicar un producto, que aparece en el mercadito, y botón para eliminarlo.
+| Carpeta | Qué es | Entregable |
+| --- | --- | --- |
+| [`frontend/`](frontend) | Interfaz en React + Vite. Lee el catálogo de la API; si la API está apagada, usa datos de ejemplo | Primero y segundo |
+| [`backend/`](backend) | API REST con Express: rutas, controladores, servicios, modelos, middlewares y PostgreSQL | Segundo |
+| [`docs/`](docs) | Documentos de los entregables, documentación de la API, colección de Postman y evidencias | Primero y segundo |
 
 ## Cómo ejecutarlo
 
-Necesitas [Node.js](https://nodejs.org) 18 o superior.
+Necesitas [Node.js](https://nodejs.org) 20 o superior. Abre **dos terminales**.
+
+**1. Backend** (puerto 3000):
 
 ```bash
-npm install     # instala las dependencias
-npm run dev     # abre la app en http://localhost:5173
+cd backend
+npm install
+npm run dev
 ```
 
-Otros comandos:
+La primera vez crea la base de datos local con datos de ejemplo. Abre <http://localhost:3000/api-docs> para ver la documentación interactiva de la API (Swagger).
+
+**2. Frontend** (puerto 5173):
 
 ```bash
-npm run build   # genera la versión de producción en dist/
-npm run lint    # revisa el código con ESLint
-npm run format  # da formato con Prettier
+cd frontend
+npm install
+npm run dev
 ```
 
-## Estructura del proyecto
+Abre <http://localhost:5173>. El pie de página dice «Datos desde la API» cuando el backend está encendido.
 
-```
-index.html           página base
-public/              logo y fotos de ejemplo
-src/
-  main.jsx           arranca React
-  App.jsx            componente raíz: guarda el estado y lo reparte por props
-  data/              datos simulados: productos, cursos, vendedores, categorías
-  pages/             una pantalla por archivo: Inicio, Mercadito, Cursos, Vender
-  components/        piezas reutilizables: Header, Footer, TarjetaProducto, TarjetaCurso,
-                     Chips, Buscador, Carrito, FormularioProducto, EstadoVacio, Aviso
-  utils/             funciones sueltas: formato de pesos, búsqueda por id
-  styles/            estilos.css con la paleta de colores
-docs/                documento del entregable y capturas del sistema funcionando
+Cuentas de prueba: `camila@plazau.co` / `demo1234` (estudiante) y `admin@plazau.co` / `admin123` (administrador).
+
+## Pruebas
+
+```bash
+cd backend
+npm test            # 77 pruebas automáticas de la API
 ```
 
-## Dónde se cumple cada requisito
+Colección de Postman: [`docs/postman`](docs/postman). Con la API encendida se puede ejecutar desde la consola:
 
-| Requisito del entregable | Dónde está |
+```bash
+npx newman run docs/postman/Plaza-U.postman_collection.json --environment docs/postman/Plaza-U.local.postman_environment.json
+```
+
+## Dónde está cada requisito del segundo entregable
+
+| Requisito | Dónde está |
 | --- | --- |
-| Proyecto con React y Vite | `package.json`, `vite.config.js`, `src/main.jsx` |
-| Estructura organizada de carpetas y componentes | carpetas `pages`, `components`, `data`, `utils`, `styles` |
-| Componentes reutilizables | `TarjetaProducto` (inicio y mercadito), `TarjetaCurso` (inicio y cursos), `Chips` (categorías y niveles), `Buscador`, `EstadoVacio` |
-| `useState` | `App.jsx` (página, productos, cursos, carrito, inscripciones, aviso); `Mercadito.jsx` y `Cursos.jsx` (filtros); `FormularioProducto.jsx` (campos y errores) |
-| Listas con `map()` | `Mercadito.jsx`, `Cursos.jsx`, `Inicio.jsx`, `Header.jsx`, `Chips.jsx`, `Carrito.jsx`, `Vender.jsx` |
-| Eventos | `onClick` (agregar, quitar, inscribirse, navegar), `onChange` (buscador, select, formulario), `onSubmit` (publicar), tecla Escape en `App.jsx` |
-| Datos simulados en arreglos | `src/data/*.js` |
-| Documento con problema y requisitos | `docs/Primer-entregable-PlazaU.docx` (y su versión en PDF) |
+| Backend con Node.js y Express | `backend/src/app.js`, `backend/src/server.js` |
+| Estructura `routes`, `controllers`, `services`, `models` | `backend/src/routes`, `controllers`, `services`, `models` |
+| Endpoints GET, POST, PUT y DELETE | 26 endpoints, ver [`docs/API.md`](docs/API.md) |
+| Middlewares de validación y manejo de errores | `backend/src/middlewares`, `backend/src/validators` |
+| Pruebas de endpoints | `docs/postman` (Postman/Newman) y `backend/tests` (automáticas) |
+| Conexión con base de datos | `backend/src/config/db.js`, `backend/src/db/schema.sql` (PostgreSQL) |
+| Documentación de la API | `docs/API.md` y Swagger en `/api-docs` |
+| Evidencia de funcionamiento | `docs/evidencias` y el documento `docs/Segundo-entregable-PlazaU.docx` |
 
-## Subirlo a GitHub
+## Estructura del repositorio
 
-1. Crea un repositorio vacío en [github.com/new](https://github.com/new) (por ejemplo `plaza-u-react`), sin README ni .gitignore.
-2. En la carpeta del proyecto:
-
-```bash
-git init
-git add .
-git commit -m "Primer entregable: Plaza U con React"
-git branch -M main
-git remote add origin https://github.com/TU-USUARIO/plaza-u-react.git
-git push -u origin main
 ```
-
-3. Agrega a Lucas como colaborador: **Settings → Collaborators → Add people**.
-
-## Siguientes pasos
-
-Esta versión no guarda nada: al recargar la página los datos vuelven a su estado inicial. La versión completa del proyecto conecta la interfaz con una API y una base de datos, con registro de usuarios, pedidos reales y comisiones.
+plaza-u/
+  backend/        API REST (Express)
+  frontend/       interfaz (React + Vite)
+  docs/
+    API.md                  documentación de los endpoints
+    postman/                colección, entorno y resultado de Newman
+    evidencias/             capturas y ejemplos
+    entregable-1/           documento y capturas del primer entregable
+    Segundo-entregable-PlazaU.docx / .pdf
+```

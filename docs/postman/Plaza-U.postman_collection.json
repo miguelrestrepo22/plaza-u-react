@@ -1,0 +1,2201 @@
+{
+  "info": {
+    "name": "Plaza U · API REST",
+    "description": "Colección de pruebas de la API de Plaza U. Ejecútala en orden: las primeras peticiones guardan los tokens y los ids que usan las siguientes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Salud",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('estado ok', () => pm.expect(pm.response.json().estado).to.eql('ok'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Autenticación",
+      "item": [
+        {
+          "name": "POST /auth/registro (cuenta nueva)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/registro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "registro"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ana Torres\",\n  \"email\": \"{{emailNuevo}}\",\n  \"password\": \"clave12345\",\n  \"carrera\": \"Diseño gráfico\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('emailNuevo', 'prueba' + Date.now() + '@correo.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Crea la cuenta (201)\", () => pm.response.to.have.status(201));",
+                  "pm.test('devuelve token y rol estudiante', () => { const j = pm.response.json(); pm.expect(j.token).to.be.a('string'); pm.expect(j.usuario.rol).to.eql('estudiante'); });",
+                  "pm.collectionVariables.set(\"usuarioNuevoId\", pm.response.json().usuario.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/registro (correo repetido)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/registro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "registro"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ana Torres\",\n  \"email\": \"{{emailNuevo}}\",\n  \"password\": \"clave12345\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Correo repetido: 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/registro (datos inválidos)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/registro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "registro"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"A\",\n  \"email\": \"no-es-correo\",\n  \"password\": \"123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Datos inválidos: 400\", () => pm.response.to.have.status(400));",
+                  "pm.test('lista los campos con error', () => pm.expect(pm.response.json().error.detalles.length).to.eql(3));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login (Camila)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"camila@plazau.co\",\n  \"password\": \"demo1234\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"tokenCamila\", pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login (Andrés)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"andres@plazau.co\",\n  \"password\": \"demo1234\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"tokenAndres\", pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login (administrador)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@plazau.co\",\n  \"password\": \"admin123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"tokenAdmin\", pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login (clave incorrecta)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"camila@plazau.co\",\n  \"password\": \"otra-clave\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Clave incorrecta: 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /auth/yo (con token)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/yo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "yo"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('es Camila', () => pm.expect(pm.response.json().email).to.eql('camila@plazau.co'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /auth/yo (sin token)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/yo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "yo"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Sin token: 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Productos",
+      "item": [
+        {
+          "name": "GET /productos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('al menos 12 productos y total en el encabezado', () => { pm.expect(pm.response.json().length).to.be.at.least(12); pm.expect(pm.response.headers.get('X-Total-Count')).to.exist; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /productos?categoria=Comida",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos?categoria=Comida",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos"
+              ],
+              "query": [
+                {
+                  "key": "categoria",
+                  "value": "Comida"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('todos son de Comida', () => pm.expect(pm.response.json().every(p => p.categoria === 'Comida')).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /productos?q=cafe (sin tilde)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos?q=cafe",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "cafe"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('encuentra el café', () => pm.expect(pm.response.json()[0].nombre).to.include('Café'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /productos?orden=precio_asc",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos?orden=precio_asc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos"
+              ],
+              "query": [
+                {
+                  "key": "orden",
+                  "value": "precio_asc"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('ordenado por precio', () => { const p = pm.response.json().map(x => x.precio); pm.expect(p).to.eql([...p].sort((a, b) => a - b)); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /productos?limite=0 (inválido)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos?limite=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos"
+              ],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Parámetro inválido: 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /productos/p1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos/p1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos",
+                "p1"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('es la vela', () => pm.expect(pm.response.json().nombre).to.include('Vela'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /productos/p999 (no existe)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos/p999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos",
+                "p999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"No existe: 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /productos (sin sesión)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/productos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Galletas de avena y miel\",\n  \"categoria\": \"Comida\",\n  \"precio\": 12000,\n  \"stock\": 25,\n  \"descripcion\": \"Galletas caseras de avena con miel, bolsa de 8 unidades.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Sin sesión: 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /productos (datos inválidos)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/productos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Galletas de avena y miel\",\n  \"categoria\": \"Comida\",\n  \"precio\": 100,\n  \"stock\": 25,\n  \"descripcion\": \"Galletas caseras de avena con miel, bolsa de 8 unidades.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Datos inválidos: 400\", () => pm.response.to.have.status(400));",
+                  "pm.test('señala el campo precio', () => pm.expect(pm.response.json().error.detalles[0].campo).to.eql('precio'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /productos (crear)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/productos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Galletas de avena y miel\",\n  \"categoria\": \"Comida\",\n  \"precio\": 12000,\n  \"stock\": 25,\n  \"descripcion\": \"Galletas caseras de avena con miel, bolsa de 8 unidades.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Crea el producto (201)\", () => pm.response.to.have.status(201));",
+                  "pm.test('trae Location', () => pm.expect(pm.response.headers.get('Location')).to.include('/api/productos/'));",
+                  "pm.collectionVariables.set(\"productoId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /productos/:id (el dueño)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/productos/{{productoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos",
+                "{{productoId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Galletas de avena y miel\",\n  \"categoria\": \"Comida\",\n  \"precio\": 13500,\n  \"stock\": 10,\n  \"descripcion\": \"Galletas caseras de avena con miel, bolsa de 8 unidades.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('precio actualizado', () => pm.expect(pm.response.json().precio).to.eql(13500));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /productos/:id (otra persona)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAndres}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/productos/{{productoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos",
+                "{{productoId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Galletas de avena y miel\",\n  \"categoria\": \"Comida\",\n  \"precio\": 12000,\n  \"stock\": 25,\n  \"descripcion\": \"Galletas caseras de avena con miel, bolsa de 8 unidades.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"No es el dueño: 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /productos/:id (otra persona)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAndres}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/productos/{{productoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos",
+                "{{productoId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"No es el dueño: 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /productos/:id (el dueño)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/productos/{{productoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos",
+                "{{productoId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Elimina el producto (204)\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /productos/:id (ya eliminado)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos/{{productoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos",
+                "{{productoId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Ya no existe: 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Cursos e inscripciones",
+      "item": [
+        {
+          "name": "GET /cursos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cursos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('al menos 8 cursos', () => pm.expect(pm.response.json().length).to.be.at.least(8));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /cursos?nivel=Principiante",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cursos?nivel=Principiante",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos"
+              ],
+              "query": [
+                {
+                  "key": "nivel",
+                  "value": "Principiante"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('todos son Principiante', () => pm.expect(pm.response.json().every(c => c.nivel === 'Principiante')).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /cursos/c1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/c1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "c1"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('trae temario', () => pm.expect(pm.response.json().temario).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /cursos (crear)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAndres}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Fotografía con el celular\",\n  \"categoria\": \"Diseño\",\n  \"nivel\": \"Principiante\",\n  \"precio\": 35000,\n  \"cupos\": 15,\n  \"horario\": \"Sábados, 10:00 a. m. · Bloque 3\",\n  \"duracion\": \"3 sesiones de 2 horas\",\n  \"descripcion\": \"Aprende encuadre, luz y edición básica para tus fotos de producto.\",\n  \"temario\": [\n    \"Encuadre y luz\",\n    \"Edición básica\"\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Crea el curso (201)\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"cursoId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /cursos (datos inválidos)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAndres}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Fotografía con el celular\",\n  \"categoria\": \"Diseño\",\n  \"nivel\": \"Experto\",\n  \"precio\": 35000,\n  \"cupos\": 15,\n  \"horario\": \"Sábados, 10:00 a. m. · Bloque 3\",\n  \"duracion\": \"3 sesiones de 2 horas\",\n  \"descripcion\": \"Aprende encuadre, luz y edición básica para tus fotos de producto.\",\n  \"temario\": [\n    \"Encuadre y luz\",\n    \"Edición básica\"\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Datos inválidos: 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /cursos/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAndres}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/{{cursoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "{{cursoId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Fotografía con el celular\",\n  \"categoria\": \"Diseño\",\n  \"nivel\": \"Principiante\",\n  \"precio\": 35000,\n  \"cupos\": 12,\n  \"horario\": \"Sábados, 10:00 a. m. · Bloque 3\",\n  \"duracion\": \"3 sesiones de 2 horas\",\n  \"descripcion\": \"Aprende encuadre, luz y edición básica para tus fotos de producto.\",\n  \"temario\": [\n    \"Encuadre y luz\",\n    \"Edición básica\"\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('cupos actualizados', () => pm.expect(pm.response.json().cupos).to.eql(12));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /cursos/:id/inscripcion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/{{cursoId}}/inscripcion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "{{cursoId}}",
+                "inscripcion"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pago\": \"Nequi\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Se inscribe (201)\", () => pm.response.to.have.status(201));",
+                  "pm.test('guarda la comisión del 10 %', () => { const j = pm.response.json(); pm.expect(j.comision).to.eql(Math.round(j.precio * 0.1)); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /cursos/:id (un cupo menos)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/{{cursoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "{{cursoId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('quedan 11 cupos', () => pm.expect(pm.response.json().cupos).to.eql(11));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /cursos/:id/inscripcion (repetida)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/{{cursoId}}/inscripcion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "{{cursoId}}",
+                "inscripcion"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Ya inscrita: 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /inscripciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/inscripciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inscripciones"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('trae el curso', () => pm.expect(pm.response.json()[0].curso.id).to.eql(pm.collectionVariables.get('cursoId')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /cursos/:id/inscripcion",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/{{cursoId}}/inscripcion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "{{cursoId}}",
+                "inscripcion"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Cancela la inscripción (204)\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /cursos/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAndres}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/{{cursoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "{{cursoId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Elimina el curso (204)\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Pedidos",
+      "item": [
+        {
+          "name": "POST /pedidos (sin sesión)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productoId\": \"p2\",\n      \"cantidad\": 1\n    }\n  ],\n  \"cliente\": {\n    \"nombre\": \"Ana Torres\",\n    \"celular\": \"3001234567\",\n    \"direccion\": \"Bloque 5, salón 302\",\n    \"notas\": \"Salgo a las 2 p. m.\"\n  },\n  \"pago\": \"Nequi\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Sin sesión: 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /pedidos (más que el stock)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productoId\": \"p2\",\n      \"cantidad\": 99\n    }\n  ],\n  \"cliente\": {\n    \"nombre\": \"Ana Torres\",\n    \"celular\": \"3001234567\",\n    \"direccion\": \"Bloque 5, salón 302\",\n    \"notas\": \"Salgo a las 2 p. m.\"\n  },\n  \"pago\": \"Nequi\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Sin stock suficiente: 409\", () => pm.response.to.have.status(409));",
+                  "pm.test('dice cuántas quedan', () => pm.expect(pm.response.json().error.mensaje).to.include('Solo quedan'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /pedidos (comprar lo propio)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAndres}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productoId\": \"p2\",\n      \"cantidad\": 1\n    }\n  ],\n  \"cliente\": {\n    \"nombre\": \"Ana Torres\",\n    \"celular\": \"3001234567\",\n    \"direccion\": \"Bloque 5, salón 302\",\n    \"notas\": \"Salgo a las 2 p. m.\"\n  },\n  \"pago\": \"Nequi\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"No puede comprar lo propio: 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /pedidos (dos vendedores)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productoId\": \"p2\",\n      \"cantidad\": 1\n    },\n    {\n      \"productoId\": \"p3\",\n      \"cantidad\": 2\n    }\n  ],\n  \"cliente\": {\n    \"nombre\": \"Ana Torres\",\n    \"celular\": \"3001234567\",\n    \"direccion\": \"Bloque 5, salón 302\",\n    \"notas\": \"Salgo a las 2 p. m.\"\n  },\n  \"pago\": \"Nequi\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Crea los pedidos (201)\", () => pm.response.to.have.status(201));",
+                  "pm.test('crea un pedido por vendedor', () => pm.expect(pm.response.json().length).to.eql(2));",
+                  "pm.test('calcula la comisión del 10 %', () => pm.response.json().forEach(p => pm.expect(p.comision).to.eql(Math.round(p.total * 0.1))));",
+                  "pm.collectionVariables.set(\"pedidoId\", pm.response.json().find(p => p.vendedorId === 'u_andres').id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /pedidos (los de Andrés)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAndres}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('incluye el pedido nuevo', () => pm.expect(pm.response.json().some(p => p.id === pm.collectionVariables.get('pedidoId'))).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /pedidos/:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos/{{pedidoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{pedidoId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('estado Nuevo', () => pm.expect(pm.response.json().estado).to.eql('Nuevo'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /pedidos/:id (de otra persona)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos/{{pedidoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{pedidoId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"El administrador sí lo ve: 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /pedidos/:id/estado (salto no permitido)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAndres}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos/{{pedidoId}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{pedidoId}}",
+                "estado"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"Entregado\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"No se salta de Nuevo a Entregado: 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /pedidos/:id/estado (comprador no avanza)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos/{{pedidoId}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{pedidoId}}",
+                "estado"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"Preparando\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"El comprador no puede avanzar: 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /pedidos/:id/estado (a Preparando)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAndres}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos/{{pedidoId}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{pedidoId}}",
+                "estado"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"Preparando\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('queda en Preparando', () => pm.expect(pm.response.json().estado).to.eql('Preparando'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /pedidos/:id/estado (cancelar y devolver stock)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAndres}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos/{{pedidoId}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{pedidoId}}",
+                "estado"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"Cancelado\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('queda Cancelado', () => pm.expect(pm.response.json().estado).to.eql('Cancelado'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /pedidos/:id/estado (ya cancelado)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAndres}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos/{{pedidoId}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{pedidoId}}",
+                "estado"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"Preparando\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Un pedido cancelado no cambia: 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Administración",
+      "item": [
+        {
+          "name": "GET /vendedores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vendedores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vendedores"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('sin correo ni WhatsApp', () => pm.expect(pm.response.json().every(v => v.email === undefined && v.whatsapp === undefined)).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /config",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/config",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "config"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('comisión del 10 %', () => pm.expect(pm.response.json().comisionPorcentaje).to.eql(10));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /config (estudiante)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/config",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "config"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comisionPorcentaje\": 5\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Un estudiante no puede: 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /config (valor inválido)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/config",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "config"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comisionPorcentaje\": 25\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Fuera de 0 a 20: 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /config (administrador)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/config",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "config"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comisionPorcentaje\": 8\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('queda en 8', () => pm.expect(pm.response.json().comisionPorcentaje).to.eql(8));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /config (volver al 10 %)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/config",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "config"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comisionPorcentaje\": 10\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /usuarios (administrador)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test('no muestra hashes', () => pm.expect(JSON.stringify(pm.response.json())).to.not.include('pass'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /usuarios (estudiante)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenCamila}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Un estudiante no puede: 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /usuarios/:id (cuenta de prueba)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioNuevoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioNuevoId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Elimina la cuenta (204)\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /usuarios/u_admin (otro administrador)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/u_admin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "u_admin"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"No se elimina a un administrador: 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "tokenCamila",
+      "value": ""
+    },
+    {
+      "key": "tokenAndres",
+      "value": ""
+    },
+    {
+      "key": "tokenAdmin",
+      "value": ""
+    },
+    {
+      "key": "productoId",
+      "value": ""
+    },
+    {
+      "key": "cursoId",
+      "value": ""
+    },
+    {
+      "key": "pedidoId",
+      "value": ""
+    },
+    {
+      "key": "usuarioNuevoId",
+      "value": ""
+    },
+    {
+      "key": "emailNuevo",
+      "value": ""
+    }
+  ]
+}

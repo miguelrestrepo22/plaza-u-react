@@ -1,0 +1,39 @@
+{
+  "name": "plaza-u-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API REST de Plaza U con Node.js y Express",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test --test-reporter=spec",
+    "docs": "node src/docs/generarMarkdown.js",
+    "postman": "node postman/generar.js",
+    "lint": "eslint .",
+    "format": "prettier --write \"src/**/*.js\" \"tests/**/*.js\" \"postman/*.js\""
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.16",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.10",
+    "express": "^4.22.3",
+    "express-validator": "^7.3.2",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.12.1",
+    "pg": "^8.23.1",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "globals": "^17.14.0",
+    "prettier": "^3.10.0",
+    "supertest": "^7.3.2"
+  }
+}
